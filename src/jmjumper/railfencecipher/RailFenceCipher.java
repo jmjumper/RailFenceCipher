@@ -26,6 +26,10 @@ public class RailFenceCipher {
         plain_length = plain.length();
         System.out.println("What do you want to be the cipher's key? (This key will be needed to decrypt the message.)");
         int key = sc.nextInt();
+        while (key > plain.length() / 2 || key == 0) {
+            System.out.println("Zu groß. Key darf nur kleiner als die Hälfte des zu verschlüsselen Texts sein.");
+            key = sc.nextInt();
+        }
         System.out.println("Encrypting with the following cipher's key: " + key);
 
         // Adjust length to be a mutliple of K (a component for decryption depends on key and length)
@@ -98,18 +102,22 @@ public class RailFenceCipher {
 
         StringBuilder decryptedText = new StringBuilder();
 
-        for ( int i = 0; i < splittedIntermediate[0].length(); i++) {
-            if ( i % 2 == 0 ) {
-                for ( int j = 0; j < key; j++) {
-                    if ( !decryptionArray[i][j].equals("-") )
-                        decryptedText.append(decryptionArray[i][j]);
-                }
-            } else {
-                for ( int j = key - 1; j >= 0; j--) {
-                    if ( !decryptionArray[i][j].equals("-") )
-                        decryptedText.append(decryptionArray[i][j]);
+        try {
+            for (int i = 0; i < splittedIntermediate[0].length(); i++) {
+                if (i % 2 == 0) {
+                    for (int j = 0; j < key; j++) {
+                        if (!decryptionArray[i][j].equals("-") && decryptionArray[i][j] != null)
+                            decryptedText.append(decryptionArray[i][j]);
+                    }
+                } else {
+                    for (int j = key - 1; j >= 0; j--) {
+                        if (!decryptionArray[i][j].equals("-") && decryptionArray[i][j] != null)
+                            decryptedText.append(decryptionArray[i][j]);
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.out.println("Fehler. Key zu groß.");
         }
         System.out.println("Done with decryption: " + decryptedText);
         return decryptedText;
@@ -132,6 +140,10 @@ public class RailFenceCipher {
     public StringBuilder forDecryption (String encrypted) {
         System.out.println("Provide the Cipher's key:");
         int keyInput = sc.nextInt();
+        if (keyInput > encrypted.length() / 2 || keyInput == 0) {
+            System.out.println("Zu groß. Key darf nur kleiner als die Hälfte des zu entschlüsselen Texts sein.");
+            forDecryption(encrypted);
+        }
         sc.close();
         return decryption(encrypted, keyInput);
     }
